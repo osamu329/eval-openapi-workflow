@@ -8,6 +8,7 @@ servers:
 paths:
   /hello:
     get:
+      description: hello
       responses:
         "200":
           content:
