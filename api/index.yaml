@@ -1,0 +1,19 @@
+openapi: "3.1.0"
+info:
+  title: Sample
+
+servers:
+  - url: "https://osna.dev"
+
+paths:
+  /hello:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
