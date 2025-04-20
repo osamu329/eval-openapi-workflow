@@ -1,0 +1,69 @@
+name: OpenAPI Documentation Preview
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**.yaml'  # OpenAPIスキーマファイルへの変更のみ対象
+      - '**.yml'
+
+permissions:
+  contents: read
+  pages: write        # GitHub Pages への書き込み権限
+  id-token: write     # OIDC トークンの使用権限（必須）  pull-requests: write  # PRへのコメント投稿に必要
+
+env:
+  PACKAGE_DIR: ""
+  API_NAME: "sample"
+
+jobs:
+  build-preview:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build documentation
+        run: npx redocly build-docs ${{env.API_NAME}} --output docs/index.html  # スキーマファイルのパスに合わせて変更してください
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN}}
+          publish_dir: ./docs
+          destination_dir: pr-${{ github.event.pull_request.number }}
+          keep_files: true  # 他のPRのプレビューを削除しない
+          force_orphan: true  # 履歴をクリーンに保つ
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Comment PR with preview URL
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN}}
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const repo = context.repo.repo;
+            const owner = context.repo.owner;
+
+            // GitHub Pages のURL構成
+            const previewUrl = `https://${owner}.github.io/${repo}/pr-${prNumber}/index.html`;
+
+            await github.rest.issues.createComment({
+              owner: owner,
+              repo: repo,
+              issue_number: prNumber,
+              body: `📚 OpenAPI Documentation Preview\n\n` +
+                    `Preview available at: ${previewUrl}\n\n` +
+                    `This preview will be automatically deleted when the PR is merged or closed.`
+            });
