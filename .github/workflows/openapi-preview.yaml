@@ -12,9 +12,9 @@ permissions:
   contents: read
   pull-requests: write  # PRへのコメント投稿に必要
 
-  env:
-    PACKAGE_DIR: ""
-    API_NAME: "sample"
+env:
+  PACKAGE_DIR: ""
+  API_NAME: "sample"
 
 jobs:
   build-preview:
