@@ -39,7 +39,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN}}
           publish_dir: ./docs
           destination_dir: pr-${{ github.event.pull_request.number }}
           keep_files: true  # 他のPRのプレビューを削除しない
@@ -50,7 +50,7 @@ jobs:
       - name: Comment PR with preview URL
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN}}
           script: |
             const prNumber = context.payload.pull_request.number;
             const repo = context.repo.repo;
