@@ -1,4 +1,4 @@
-lname: Cleanup API Document Preview
+name: Cleanup API Document Preview
 
 on:
   pull_request:
